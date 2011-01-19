@@ -1,10 +1,14 @@
+### -*- coding: utf-8 -*- ####################################################
+
+from datetime import datetime
+
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 
 class Cart(models.Model):
-    creation_date = models.DateTimeField(verbose_name=_('creation date'))
+    creation_date = models.DateTimeField(verbose_name=_('creation date'), default=datetime.now)
     checked_out = models.BooleanField(default=False, verbose_name=_('checked out'))
 
     class Meta:
@@ -17,41 +21,34 @@ class Cart(models.Model):
 
 class ItemManager(models.Manager):
     def get(self, *args, **kwargs):
-        if 'product' in kwargs:
-            kwargs['content_type'] = ContentType.objects.get_for_model(type(kwargs['product']))
-            kwargs['object_id'] = kwargs['product'].pk
-            del(kwargs['product'])
+        if 'content_object' in kwargs:
+            kwargs['content_type'] = ContentType.objects.get_for_model(type(kwargs['content_object']))
+            kwargs['object_id'] = kwargs['content_object'].pk
+            del(kwargs['content_object'])
         return super(ItemManager, self).get(*args, **kwargs)
 
 class Item(models.Model):
     cart = models.ForeignKey(Cart, verbose_name=_('cart'))
-    quantity = models.PositiveIntegerField(verbose_name=_('quantity'))
-    unit_price = models.DecimalField(max_digits=18, decimal_places=2, verbose_name=_('unit price'))
+    
+    quantity = models.PositiveIntegerField(verbose_name=_('quantity'), default=1)
+    unit_price = models.DecimalField(max_digits=18, decimal_places=2, verbose_name=_('unit price'), blank=True, null=True)
+    
     # product as generic relation
     content_type = models.ForeignKey(ContentType)
-    object_id = models.PositiveIntegerField()
+    object_pk = models.PositiveIntegerField()
+    content_object = generic.GenericForeignKey('content_type', 'object_pk')
 
     objects = ItemManager()
 
     class Meta:
         verbose_name = _('item')
         verbose_name_plural = _('items')
-        ordering = ('cart',)
+        order_with_respect_to = 'cart'
+        unique_together = ('cart', 'content_type', 'object_pk')
 
     def __unicode__(self):
-        return 'Item in cart: ' + unicode(self.cart)
+        return 'Content: %s, cart: %s' % (self.content_object, self.cart)
 
     def total_price(self):
         return self.quantity * self.unit_price
     total_price = property(total_price)
-
-    # product
-    def get_product(self):
-        return self.content_type.get_object_for_this_type(id=self.object_id)
-
-    def set_product(self, product):
-        self.content_type = ContentType.objects.get_for_model(type(product))
-        self.object_id = product.pk
-
-    product = property(get_product, set_product)
-

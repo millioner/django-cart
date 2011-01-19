@@ -1,7 +1,10 @@
-import datetime
-import models
+### -*- coding: utf-8 -*- ####################################################
 
-CART_ID = 'CART-ID'
+import datetime
+
+from models import Cart, Item
+
+CART_PK = 'CART-ID'
 
 class ItemAlreadyExists(Exception):
     pass
@@ -9,13 +12,14 @@ class ItemAlreadyExists(Exception):
 class ItemDoesNotExist(Exception):
     pass
 
-class Cart:
+class Cart(object):
+    
     def __init__(self, request):
-        cart_id = request.session.get(CART_ID)
+        cart_id = request.session.get(CART_PK)
         if cart_id:
             try:
-                cart = models.Cart.objects.get(id=cart_id, checked_out=False)
-            except models.Cart.DoesNotExist:
+                cart = Cart.objects.get(id=cart_id, checked_out=False)
+            except Cart.DoesNotExist:
                 cart = self.new(request)
         else:
             cart = self.new(request)
@@ -26,58 +30,44 @@ class Cart:
             yield item
 
     def new(self, request):
-        cart = models.Cart(creation_date=datetime.datetime.now())
-        cart.save()
-        request.session[CART_ID] = cart.id
+        cart = Cart.objects.create()
+        request.session[CART_PK] = cart.pk
         return cart
 
-    def add(self, product, unit_price, quantity=1):
-        try:
-            item = models.Item.objects.get(cart=self.cart, product=product,)
-        except models.Item.DoesNotExist:
-            item = models.Item()
-            item.cart = self.cart
-            item.product = product
-            item.unit_price = unit_price
-            item.quantity = quantity
-            item.save()
-        else:
-            raise ItemAlreadyExists
+    def add(self, content_type, object_pk, unit_price, quantity=1):
+        return self.cart.item_set.create(content_type = content_type, 
+                                   object_pk = object_pk, 
+                                   unit_price = unit_price, 
+                                   quantity = quantity)
+        #raise ItemAlreadyExists
 
     def remove(self, item):
-        try:
-            item = models.Item.objects.get(pk=item.pk)
-        except models.Item.DoesNotExist:
+        """Removes a cart's item"""
+        if item not in self.cart:
             raise ItemDoesNotExist
-        else:
-            item.delete()
+            
+        item.delete()
 
-    def update(self, product, unit_price, quantity):
-        try:
-            item = models.Item.objects.get(
-                cart=self.cart,
-                product=product,
-            )
-            item.cart = self.cart
-            item.product = product
-            item.unit_price = unit_price
-            item.quantity = quantity
-            item.save(force_update = True)
-        except models.Item.DoesNotExist:
+    def update(self, item, price, quantity):
+        """Changes an item's price and quantity"""
+        if item not in self.cart:
             raise ItemDoesNotExist
+        
+        item.unit_price = price
+        item.quantity = quantity
+        item.save()
 
     def clear(self):
-        for item in self.cart.item_set.all():
-            item.delete()
+        """Clears the cart"""
+        self.cart.item_set.all().delete()
 
     # There's all sort of info you might want to easily get from your cart
     
-    def getQuantity(self, product):
+    def getQuantity(self, content_object):
         try: 
-            item = models.Item.objects.get(cart = self.cart, product = product)
+            item = Item.objects.get(cart = self.cart, content_object = content_object)
             return item.quantity
-            
-        except models.Item.DoesNotExist:
+        except Item.DoesNotExist:
             raise ItemDoesNotExist
     
     def checkout_cart(self):

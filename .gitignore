@@ -27,3 +27,6 @@ src/.idea/
 
 #defaults
 *.pyc
+
+Subversion's specific
+.svn

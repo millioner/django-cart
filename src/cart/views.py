@@ -1,12 +1,72 @@
-from django.http import HttpResponseRedirect
-from django.conf import settings
-from cart import Cart, ItemAlreadyExists, ItemDoesNotExist
+### -*- coding: utf-8 -*- ####################################################
+
+from django.core.urlresolvers import reverse
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404, redirect
+from django.views.generic.simple import direct_to_template
+from django.utils.translation import ugettext
+from django.contrib import messages
+from django.views.generic.create_update import apply_extra_context
+from django.views.decorators.http import require_POST, require_GET
+from django.core.exceptions import NON_FIELD_ERRORS
+
+from cart import Cart, ItemAlreadyExists
 from cart.models import Item
 
-# Create your views here.
+@require_POST
+def show_cart(request, template_name, extra_context=None):
+    """Lists cart's items"""
+    cart = Cart(request)
+    
+    context = {'object_list': iter(cart),}
+    apply_extra_context(extra_context or {}, context)
+    
+    return direct_to_template(request, template=template_name, extra_context=context)
 
-# TODO: We should provide some built-in views for common actions such 
-# as adding an item to cart (addToCart), removing an item from the 
-# cart (removeFromCart), updating the info for an item (updateItem), 
-# and I'm sure some other stuff. The problem is that we need a way to 
-# allow for users to place an arbitrary item in the cart.
+@require_POST
+def add_to_cart(request, form_class, 
+                success_message=ugettext('Item was successfully added to the cart.'),
+                redirect_to="show_cart"):
+    """Append unique content object to card. """
+    form = form_class(request.POST)
+    if form.is_valid():
+        item = form.save(False)
+        item.cart = Cart(request).cart
+        item.save()
+        
+        messages.success(request, success_message)
+    else:
+        messages.error(request, form.errors[NON_FIELD_ERRORS].as_text())
+
+    return redirect(redirect_to)
+
+@require_POST
+def update_item(request, item_pk, form_class, queryset=Item.objects.all(), redirect_to="show_cart"):
+    
+    cart = Cart(request)
+    item = get_object_or_404(queryset.filter(cart=cart), pk=item_pk)
+    
+    form = form_class(request.POST, instance=item)
+    if form.is_valid():
+        item = form.save()
+    
+        messages.success(request, ugettext('Successfully saved.'))
+
+    return redirect(redirect_to)
+
+def remove_item(request, item_pk, queryset=Item.objects.all(), redirect_to="show_cart"):
+    cart = Cart(request)
+    cart_item = get_object_or_404(queryset.filter(cart=cart), pk=item_pk)
+    cart_item.delete()
+
+    messages.success(request, _('Successfully deleted.'))
+
+    return redirect(redirect_to)
+
+
+def clear(request, message=_(u'The cart was cleared successfully.'), redirect_to="show_cart"):
+    Cart(request).clear()
+
+    messages.success(request, message)
+
+    return redirect(redirect_to)
