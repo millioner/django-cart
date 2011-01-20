@@ -14,7 +14,7 @@ def add_to_cart_url(obj):
     return reverse('add_to_cart', content_type_pk=ct_pk, object_pk=obj.pk)
 
 
-def cart_count(request):
+def get_cart_count(request):
     return Cart(request).cart.item_set.count()
 
-show_cart_count = function(show_cart_count, takes_request=1)
+get_cart_count = function(get_cart_count, takes_request=1)
