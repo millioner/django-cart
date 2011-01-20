@@ -12,7 +12,7 @@ urlpatterns = patterns('cart.views',
     
     url('^add/(?P<content_type_pk>[\d]+)/(?P<object_pk>[\d]+)/$', 'add_to_cart', {}, name="add_to_cart"),
     
-    url('^remove/(?P<item_pk>[\d]+)/$', 'remove', {
+    url('^remove/(?P<item_pk>[\d]+)/$', 'remove_item', {
         'form_class': ItemForm,
     }, name="remove_item"),
     
