@@ -7,13 +7,13 @@ from django.views.generic.simple import direct_to_template
 from django.utils.translation import ugettext
 from django.contrib import messages
 from django.views.generic.create_update import apply_extra_context
-from django.views.decorators.http import require_POST, require_GET
+#from django.views.decorators.http import require_POST, require_GET
 from django.core.exceptions import NON_FIELD_ERRORS
 
 from .cart import Cart, ItemAlreadyExists
 from .models import Item
 
-@require_POST
+
 def show_cart(request, template_name, extra_context=None):
     """Lists cart's items"""
     cart = Cart(request)
@@ -23,7 +23,6 @@ def show_cart(request, template_name, extra_context=None):
     
     return direct_to_template(request, template=template_name, extra_context=context)
 
-@require_POST
 def add_to_cart(request, content_type_pk, object_pk, 
                 success_message=ugettext('Item was successfully added to the cart.'),
                 redirect_to="show_cart"):
@@ -37,7 +36,6 @@ def add_to_cart(request, content_type_pk, object_pk,
 
     return redirect(redirect_to)
 
-@require_POST
 def update_item(request, item_pk, form_class, queryset=Item.objects.all(), redirect_to="show_cart"):
     
     cart = Cart(request)
