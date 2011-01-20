@@ -16,9 +16,8 @@ from .models import Item
 
 def show_cart(request, template_name, extra_context=None):
     """Lists cart's items"""
-    cart = Cart(request)
     
-    context = {'object_list': iter(cart),}
+    context = {'cart': Cart(request),}
     apply_extra_context(extra_context or {}, context)
     
     return direct_to_template(request, template=template_name, extra_context=context)
