@@ -2,7 +2,7 @@
 
 import datetime
 
-from .models import Cart, Item
+from .models import Cart as CartModel, Item
 
 CART_PK = 'CART-ID'
 
@@ -18,8 +18,8 @@ class Cart(object):
         cart_id = request.session.get(CART_PK)
         if cart_id:
             try:
-                cart = Cart.objects.get(id=cart_id, checked_out=False)
-            except Cart.DoesNotExist:
+                cart = CartModel.objects.get(id=cart_id, checked_out=False)
+            except CartModel.DoesNotExist:
                 cart = self.new(request)
         else:
             cart = self.new(request)
@@ -30,7 +30,7 @@ class Cart(object):
             yield item
 
     def new(self, request):
-        cart = Cart.objects.create()
+        cart = CartModel.objects.create()
         request.session[CART_PK] = cart.pk
         return cart
 
