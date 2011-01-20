@@ -10,7 +10,9 @@ from django.contrib.contenttypes import generic
 class Cart(models.Model):
     creation_date = models.DateTimeField(verbose_name=_('creation date'), default=datetime.now)
     checked_out = models.BooleanField(default=False, verbose_name=_('checked out'))
-
+    
+    user = models.OneToOneField(blank=True, null=True)
+    
     class Meta:
         verbose_name = _('cart')
         verbose_name_plural = _('carts')
@@ -30,8 +32,10 @@ class ItemManager(models.Manager):
 class Item(models.Model):
     cart = models.ForeignKey(Cart, verbose_name=_('cart'))
     
-    quantity = models.PositiveIntegerField(verbose_name=_('quantity'), default=1)
-    unit_price = models.DecimalField(max_digits=18, decimal_places=2, verbose_name=_('unit price'), blank=True, null=True)
+    quantity = models.PositiveIntegerField(_('quantity'), default=1)
+    unit_price = models.DecimalField(_('unit price'), max_digits=18, decimal_places=2, blank=True, null=True)
+    
+    active = models.BooleanField(_("active"), default=True)
     
     # product as generic relation
     content_type = models.ForeignKey(ContentType)

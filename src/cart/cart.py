@@ -34,7 +34,7 @@ class Cart(object):
         request.session[CART_PK] = cart.pk
         return cart
 
-    def add(self, content_type, object_pk, unit_price, quantity=1):
+    def add(self, content_type, object_pk, unit_price=0, quantity=1):
         return self.cart.item_set.create(content_type = content_type, 
                                    object_pk = object_pk, 
                                    unit_price = unit_price, 

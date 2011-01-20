@@ -24,19 +24,16 @@ def show_cart(request, template_name, extra_context=None):
     return direct_to_template(request, template=template_name, extra_context=context)
 
 @require_POST
-def add_to_cart(request, form_class, 
+def add_to_cart(request, content_type_pk, object_pk, 
                 success_message=ugettext('Item was successfully added to the cart.'),
                 redirect_to="show_cart"):
     """Append unique content object to card. """
-    form = form_class(request.POST)
-    if form.is_valid():
-        item = form.save(False)
-        item.cart = Cart(request).cart
-        item.save()
-        
-        messages.success(request, success_message)
-    else:
-        messages.error(request, form.errors[NON_FIELD_ERRORS].as_text())
+    
+    Cart(request).cart.item_set.create(content_type_id = content_type_pk, object_pk = object_pk)
+    
+    messages.success(request, success_message)
+    
+    #messages.error(request, form.errors[NON_FIELD_ERRORS].as_text())
 
     return redirect(redirect_to)
 
