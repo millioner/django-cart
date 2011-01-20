@@ -51,17 +51,19 @@ def update_item(request, item_pk, form_class, queryset=Item.objects.all(), redir
 
     return redirect(redirect_to)
 
-def remove_item(request, item_pk, queryset=Item.objects.all(), redirect_to="show_cart"):
+def remove_item(request, item_pk, queryset=Item.objects.all(), 
+                success_message=ugettext('Successfully deleted.'), 
+                redirect_to="show_cart"):
     cart = Cart(request)
     cart_item = get_object_or_404(queryset.filter(cart=cart), pk=item_pk)
     cart_item.delete()
 
-    messages.success(request, _('Successfully deleted.'))
+    messages.success(request, success_message)
 
     return redirect(redirect_to)
 
 
-def clear(request, message=_(u'The cart was cleared successfully.'), redirect_to="show_cart"):
+def clear(request, message=ugettext(u'The cart was cleared successfully.'), redirect_to="show_cart"):
     Cart(request).clear()
 
     messages.success(request, message)
