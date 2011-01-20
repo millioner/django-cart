@@ -11,7 +11,7 @@ from cart.cart import Cart
 def add_to_cart_url(obj):
     ct_pk = ContentType.objects.get_for_model(obj).pk
     
-    return reverse('add_to_cart', content_type_pk=ct_pk, object_pk=obj.pk)
+    return reverse('add_to_cart', kwargs={'content_type_pk': ct_pk, 'object_pk': obj.pk}, current_app='cart')
 
 
 def get_cart_count(request):
