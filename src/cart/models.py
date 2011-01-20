@@ -11,7 +11,7 @@ class Cart(models.Model):
     creation_date = models.DateTimeField(verbose_name=_('creation date'), default=datetime.now)
     checked_out = models.BooleanField(default=False, verbose_name=_('checked out'))
     
-    user = models.OneToOneField(blank=True, null=True)
+    user = models.OneToOneField('auth.user', blank=True, null=True)
     
     class Meta:
         verbose_name = _('cart')
