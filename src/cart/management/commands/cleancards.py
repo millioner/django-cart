@@ -13,4 +13,4 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         check_date = datetime.datetime.now() - datetime.timedelta(seconds=settings.SESSION_COOKIE_AGE)
-        Cart.objects.filter(creation_date__lt=check_date).delete()
+        Cart.objects.filter(creation_date__lt=check_date, user__isnull=True).delete()

@@ -10,8 +10,8 @@ from django.views.generic.create_update import apply_extra_context
 from django.views.decorators.http import require_POST, require_GET
 from django.core.exceptions import NON_FIELD_ERRORS
 
-from cart import Cart, ItemAlreadyExists
-from cart.models import Item
+from .cart import Cart, ItemAlreadyExists
+from .models import Item
 
 @require_POST
 def show_cart(request, template_name, extra_context=None):
