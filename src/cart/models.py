@@ -20,6 +20,9 @@ class Cart(models.Model):
 
     def __unicode__(self):
         return unicode(self.creation_date)
+    
+    def get_amount(self):
+        return sum(item.get_amount() for item in self.item_set.all())
 
 class ItemManager(models.Manager):
     def get(self, *args, **kwargs):
@@ -33,7 +36,6 @@ class Item(models.Model):
     cart = models.ForeignKey(Cart, verbose_name=_('cart'))
     
     quantity = models.PositiveIntegerField(_('quantity'), default=1)
-    unit_price = models.DecimalField(_('unit price'), max_digits=18, decimal_places=2, blank=True, null=True)
     
     active = models.BooleanField(_("active"), default=True)
     
@@ -53,6 +55,5 @@ class Item(models.Model):
     def __unicode__(self):
         return 'Content: %s, cart: %s' % (self.content_object, self.cart)
 
-    def total_price(self):
-        return self.quantity * self.unit_price
-    total_price = property(total_price)
+    def get_amount(self):
+        return self.content_object.get_amount(self.quantity)

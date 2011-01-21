@@ -33,7 +33,10 @@ class Cart(object):
         cart = CartModel.objects.create()
         request.session[CART_PK] = cart.pk
         return cart
-
+    
+    def get_amount(self):
+        return self.cart.get_amount()
+    
     def add(self, content_type, object_pk, unit_price=0, quantity=1):
         return self.cart.item_set.create(content_type = content_type, 
                                    object_pk = object_pk, 

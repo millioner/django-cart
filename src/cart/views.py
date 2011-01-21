@@ -22,12 +22,12 @@ def show_cart(request, template_name, extra_context=None):
     
     return direct_to_template(request, template=template_name, extra_context=context)
 
-def add_to_cart(request, content_type_pk, object_pk, 
+def add_to_cart(request, content_type_pk, object_pk, quantity,
                 success_message=ugettext('Item was successfully added to the cart.'),
                 redirect_to="show_cart"):
     """Append unique content object to card. """
     
-    Cart(request).cart.item_set.create(content_type_id = content_type_pk, object_pk = object_pk)
+    Cart(request).cart.item_set.create(content_type_id=content_type_pk, object_pk=object_pk, quantity=quantity)
     
     messages.success(request, success_message)
     
