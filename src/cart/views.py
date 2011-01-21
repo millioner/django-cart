@@ -48,6 +48,18 @@ def update_item(request, item_pk, form_class, queryset=Item.objects.all(), redir
 
     return redirect(redirect_to)
 
+
+def switch_item(request, item_pk, state, queryset=Item.objects.all(), 
+                success_message=ugettext('Successfully switched.'), 
+                redirect_to="show_cart"):
+    cart = Cart(request)
+    cart_item = get_object_or_404(queryset.filter(cart=cart), pk=item_pk)
+    cart_item.switch()
+    
+    messages.success(request, success_message)
+
+    return redirect(redirect_to)
+
 def remove_item(request, item_pk, queryset=Item.objects.all(), 
                 success_message=ugettext('Successfully deleted.'), 
                 redirect_to="show_cart"):

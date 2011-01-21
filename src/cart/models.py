@@ -58,3 +58,6 @@ class Item(models.Model):
     def get_amount(self):
         return self.content_object.get_amount(self.quantity)
     
+    def switch(self, state):
+        self.active = state
+        self.save()
