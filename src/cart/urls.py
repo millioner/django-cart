@@ -21,9 +21,9 @@ urlpatterns = patterns('cart.views',
         'state': False,
     }, name="disable_item"),
     
-    url('^change_quantity/(?P<item_pk>[\w]+)/(?P<param_name>[\w]+)/$', 'change_quantity', {}, name='change_quantity'), 
+    url('^change_quantity/(?P<pk_param>[\w]+)/(?P<param_name>[\w]+)/$', 'change_quantity', {}, name='change_quantity'), 
     
-    url('^remove/(?P<pk_param>[\d]+)/$', 'remove_item', {}, name="remove_item"),
+    url('^remove/(?P<item_pk>[\d]+)/$', 'remove_item', {}, name="remove_item"),
     
     url(r'^clear/$', 'clear', name='clear_cart'),
 
