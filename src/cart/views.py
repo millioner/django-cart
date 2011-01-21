@@ -98,3 +98,7 @@ def clear(request, message=ugettext(u'The cart was cleared successfully.'), redi
     messages.success(request, message)
 
     return redirect(redirect_to)
+
+
+def get_amount(request):
+    return Cart(request).get_amount()

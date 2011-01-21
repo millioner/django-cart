@@ -26,5 +26,7 @@ urlpatterns = patterns('cart.views',
     url('^remove/(?P<item_pk>[\d]+)/$', 'remove_item', {}, name="remove_item"),
     
     url(r'^clear/$', 'clear', name='clear_cart'),
+    
+    url(r'^get_amount/$', 'gt_amount', name='get_amount'),
 
 )
