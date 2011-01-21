@@ -54,7 +54,7 @@ def switch_item(request, item_pk, state, queryset=Item.objects.all(),
                 redirect_to="show_cart"):
     cart = Cart(request).cart
     cart_item = get_object_or_404(queryset.filter(cart=cart), pk=item_pk)
-    cart_item.switch()
+    cart_item.switch(state)
     
     messages.success(request, success_message)
 
