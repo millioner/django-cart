@@ -101,4 +101,4 @@ def clear(request, message=ugettext(u'The cart was cleared successfully.'), redi
 
 
 def get_amount(request):
-    return Cart(request).get_amount()
+    return HttpResponse(Cart(request).get_amount())
