@@ -13,6 +13,8 @@ def read(fname):
 install_requires = [
         'setuptools',
         'Django',
+        'south',
+        'django-native-tags',
 ]
 
 #Execute function to handle setuptools functionality
