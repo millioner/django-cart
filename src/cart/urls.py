@@ -27,6 +27,6 @@ urlpatterns = patterns('cart.views',
     
     url(r'^clear/$', 'clear', name='clear_cart'),
     
-    url(r'^get_amount/$', 'gt_amount', name='get_amount'),
+    url(r'^get_amount/$', 'get_amount', name='get_amount'),
 
 )
