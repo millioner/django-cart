@@ -21,8 +21,11 @@ class Cart(models.Model):
     def __unicode__(self):
         return unicode(self.creation_date)
     
+    def get_active_items(self):
+        return self.item_set.filter(active=True)
+    
     def get_amount(self):
-        return sum(item.get_amount() for item in self.item_set.all())
+        return sum(item.get_amount() for item in self.get_active_items())
 
 class ItemManager(models.Manager):
     def get(self, *args, **kwargs):
