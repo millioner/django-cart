@@ -58,5 +58,3 @@ class Item(models.Model):
     def get_amount(self):
         return self.content_object.get_amount(self.quantity)
     
-    def get_valid_quantities(self):
-        return self.content_object.get_valid_quantities()
