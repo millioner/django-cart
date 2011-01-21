@@ -21,6 +21,8 @@ urlpatterns = patterns('cart.views',
         'state': False,
     }, name="disable_item"),
     
+    url('^change_quantity/$', 'change_quantity', {}, name='change_quantity'), 
+    
     url('^remove/(?P<item_pk>[\d]+)/$', 'remove_item', {}, name="remove_item"),
     
     url(r'^clear/$', 'clear', name='clear_cart'),

@@ -7,7 +7,7 @@ from django.views.generic.simple import direct_to_template
 from django.utils.translation import ugettext
 from django.contrib import messages
 from django.views.generic.create_update import apply_extra_context
-#from django.views.decorators.http import require_POST, require_GET
+from django.views.decorators.http import require_POST, require_GET
 from django.core.exceptions import NON_FIELD_ERRORS
 
 from .cart import Cart, ItemAlreadyExists
@@ -59,6 +59,26 @@ def switch_item(request, item_pk, state, queryset=Item.objects.all(),
     messages.success(request, success_message)
 
     return redirect(redirect_to)
+
+@require_POST
+def change_quantity(request, pk_param, param_name, queryset=Item.objects.all(), redirect_to="show_cart"):
+    
+    item_pk = request.POST.get(pk_param)
+    quantity = request.POST.get(param_name)
+    
+    
+    cart = Cart(request).cart
+    cart_item = get_object_or_404(queryset.filter(cart=cart), pk=item_pk)
+    
+    
+    if quantity and cart_item.quantity != quantity:
+        cart_item.quantity = quantity
+        cart_item.save()
+    
+    if request.is_ajax():
+        return HttpResponse(cart_item.get_amount())
+    else:
+        return redirect(redirect_to)
 
 def remove_item(request, item_pk, queryset=Item.objects.all(), 
                 success_message=ugettext('Successfully deleted.'), 
