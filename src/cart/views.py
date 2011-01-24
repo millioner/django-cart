@@ -51,7 +51,7 @@ def cart__item_view(func):
         else:
             messages.success(request, success_message)
             return redirect(redirect_to)
-
+    return wrapper
 
 @cart__item_view
 def restore_item(item):
