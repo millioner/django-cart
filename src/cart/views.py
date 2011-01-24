@@ -26,15 +26,25 @@ def show_cart(request, template_name, extra_context=None):
 
 def add_to_cart(request, content_type_pk, object_pk, quantity,
                 success_message=ugettext('Item was successfully added to the cart.'),
+                duplicate_massage=ugettext('You have such an item in your cart.'),
                 redirect_to="show_cart"):
     """Append unique content object to card. """
     
-    Cart(request).cart.item_set.create(content_type_id=content_type_pk, object_pk=object_pk, quantity=quantity)
+    cart = Cart(request).cart
     
-    if request.is_ajax():
-        return HttpResponse('true')
+    if cart.item_set.filter(content_type_id=content_type_pk, object_pk=object_pk).exists() and request.is_ajax():
+        raise ItemAlreadyExists
+    
+    if not cart.item_set.filter(content_type_id=content_type_pk, object_pk=object_pk).exists():
+        cart.item_set.create(content_type_id=content_type_pk, object_pk=object_pk, quantity=quantity)
+        message = success_message
     else:
-        messages.success(request, success_message)
+        message = duplicate_massage
+        
+    if request.is_ajax():
+        return HttpResponse(message)
+    else:
+        messages.info(request, message)
         return redirect(redirect_to)
 
 
