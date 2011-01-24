@@ -98,3 +98,6 @@ def clear(request, message=ugettext(u'The cart was cleared successfully.'), redi
 
 def get_amount(request):
     return HttpResponse(Cart(request).get_amount())
+
+def get_count(request):
+    return HttpResponse(Cart(request).get_count())

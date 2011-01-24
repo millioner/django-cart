@@ -19,7 +19,7 @@ def add_to_cart_url(obj, quantity):
 
 
 def get_cart_count(request):
-    return Cart(request).cart.item_set.count()
+    return Cart(request).get_count()
 
 get_cart_count = function(get_cart_count, takes_request=1)
 

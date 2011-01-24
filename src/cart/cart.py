@@ -37,6 +37,9 @@ class Cart(object):
     def get_amount(self):
         return self.cart.get_amount()
     
+    def get_count(self):
+        return self.cart.item_set.count()
+    
     def add(self, content_type, object_pk, unit_price=0, quantity=1):
         return self.cart.item_set.create(content_type = content_type, 
                                    object_pk = object_pk, 
