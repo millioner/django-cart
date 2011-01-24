@@ -1,5 +1,7 @@
 ### -*- coding: utf-8 -*- ####################################################
 
+from functools import wraps
+
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
@@ -31,34 +33,39 @@ def add_to_cart(request, content_type_pk, object_pk, quantity,
     
     messages.success(request, success_message)
     
-    #messages.error(request, form.errors[NON_FIELD_ERRORS].as_text())
-
-    return redirect(redirect_to)
-
-def update_item(request, item_pk, form_class, queryset=Item.objects.all(), redirect_to="show_cart"):
-    
-    cart = Cart(request).cart
-    item = get_object_or_404(queryset.filter(cart=cart), pk=item_pk)
-    
-    form = form_class(request.POST, instance=item)
-    if form.is_valid():
-        item = form.save()
-    
-        messages.success(request, ugettext('Successfully saved.'))
-
     return redirect(redirect_to)
 
 
-def switch_item(request, item_pk, state, queryset=Item.objects.all(), 
-                success_message=ugettext('Successfully switched.'), 
-                redirect_to="show_cart"):
-    cart = Cart(request).cart
-    cart_item = get_object_or_404(queryset.filter(cart=cart), pk=item_pk)
-    cart_item.switch(state)
-    
-    messages.success(request, success_message)
+def cart__item_view(func):
+    @wraps(func)
+    def wrapper(request, item_pk, queryset=Item.objects.all(), 
+                success_message=ugettext('Success.'),
+                redirect_to="show_cart", **kwargs):
+        cart = Cart(request).cart
+        item = get_object_or_404(queryset.filter(cart=cart), pk=item_pk)
+        
+        func(item)
+        
+        if request.is_ajax():
+            return HttpResponse('true')
+        else:
+            messages.success(request, success_message)
+            return redirect(redirect_to)
 
-    return redirect(redirect_to)
+
+@cart__item_view
+def restore_item(item):
+    item.switch(True)
+
+@cart__item_view
+def disable_item(item):
+    item.switch(False)
+
+
+@cart__item_view
+def remove_item(item):
+    item.delete()
+    
 
 @require_POST
 def change_quantity(request, pk_param, param_name, queryset=Item.objects.all(), redirect_to="show_cart"):
@@ -79,17 +86,6 @@ def change_quantity(request, pk_param, param_name, queryset=Item.objects.all(), 
         return HttpResponse(cart_item.get_amount())
     else:
         return redirect(redirect_to)
-
-def remove_item(request, item_pk, queryset=Item.objects.all(), 
-                success_message=ugettext('Successfully deleted.'), 
-                redirect_to="show_cart"):
-    cart = Cart(request).cart
-    cart_item = get_object_or_404(queryset.filter(cart=cart), pk=item_pk)
-    cart_item.delete()
-
-    messages.success(request, success_message)
-
-    return redirect(redirect_to)
 
 
 def clear(request, message=ugettext(u'The cart was cleared successfully.'), redirect_to="show_cart"):

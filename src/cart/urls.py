@@ -1,8 +1,8 @@
 ### -*- coding: utf-8 -*- ####################################################
 
 from django.conf.urls.defaults import *
+from django.utils.translation import ugettext_lazy as _
 
-from .forms import ItemForm
 
 urlpatterns = patterns('cart.views',
 
@@ -13,17 +13,19 @@ urlpatterns = patterns('cart.views',
     url('^add/(?P<content_type_pk>[\d]+)/(?P<object_pk>[\d]+)/(?P<quantity>[\d]+)/$', 
         'add_to_cart', {}, name="add_to_cart"),
     
-    url('^activate/(?P<item_pk>[\d]+)/$', 'switch_item', {
-        'state': True,
-    }, name="activate_item"),
+    url('^restore/(?P<item_pk>[\d]+)/$', 'restore_item', {
+        'success_message': _('Restored successfully.'),
+    }, name="restore_item"),
     
-    url('^disable/(?P<item_pk>[\d]+)/$', 'switch_item', {
-        'state': False,
+    url('^disable/(?P<item_pk>[\d]+)/$', 'disable_item', {
+        'success_message': _('Disabled successfully.'),
     }, name="disable_item"),
     
     url('^change_quantity/(?P<pk_param>[\w]+)/(?P<param_name>[\w]+)/$', 'change_quantity', {}, name='change_quantity'), 
     
-    url('^remove/(?P<item_pk>[\d]+)/$', 'remove_item', {}, name="remove_item"),
+    url('^remove/(?P<item_pk>[\d]+)/$', 'remove_item', {
+        'success_message': _('Deleted successfully.'),
+    }, name="remove_item"),
     
     url(r'^clear/$', 'clear', name='clear_cart'),
     
