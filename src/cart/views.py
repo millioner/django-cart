@@ -32,10 +32,10 @@ def add_to_cart(request, content_type_pk, object_pk, quantity,
     
     cart = Cart(request).cart
     
-    if cart.item_set.filter(content_type_id=content_type_pk, object_pk=object_pk).exists() and request.is_ajax():
+    if cart.item_set.filter(content_type__pk=content_type_pk, object_pk=object_pk).exists() and request.is_ajax():
         raise ItemAlreadyExists
     
-    if not cart.item_set.filter(content_type_id=content_type_pk, object_pk=object_pk).exists():
+    if not cart.item_set.filter(content_type__pk=content_type_pk, object_pk=object_pk).exists():
         cart.item_set.create(content_type_id=content_type_pk, object_pk=object_pk, quantity=quantity)
         message = success_message
     else:
