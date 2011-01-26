@@ -9,9 +9,8 @@ from django.contrib.contenttypes import generic
 
 class Cart(models.Model):
     creation_date = models.DateTimeField(verbose_name=_('creation date'), default=datetime.now)
-    checked_out = models.BooleanField(default=False, verbose_name=_('checked out'))
     
-    user = models.OneToOneField('auth.User', blank=True, null=True)
+    user = models.OneToOneField('auth.User', related_name="cart", blank=True, null=True)
     
     class Meta:
         verbose_name = _('cart')
@@ -26,6 +25,7 @@ class Cart(models.Model):
     
     def get_amount(self):
         return sum(item.get_amount() for item in self.get_active_items())
+
 
 class ItemManager(models.Manager):
     def get(self, *args, **kwargs):

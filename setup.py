@@ -19,7 +19,7 @@ install_requires = [
 
 #Execute function to handle setuptools functionality
 setup(name="django-cart",
-    version="0.1",
+    version="0.2",
     description="Django application to rate objects & stars UI",
     long_description=read('README'),
     packages=find_packages('src'),

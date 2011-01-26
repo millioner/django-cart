@@ -15,24 +15,35 @@ class ItemDoesNotExist(Exception):
 class Cart(object):
     
     def __init__(self, request):
-        cart_id = request.session.get(CART_PK)
-        if cart_id:
+        cart_pk = request.session.get(CART_PK)
+        if cart_pk:
             try:
-                cart = CartModel.objects.get(id=cart_id, checked_out=False)
+                cart = CartModel.objects.get(pk=cart_pk)
             except CartModel.DoesNotExist:
-                cart = self.new(request)
+                cart = CartModel.objects.create()
+                request.session[CART_PK] = cart.pk
+            
+            if request.user.is_authenticated() and not cart.user:
+                cart.user = request.user
+                cart.save()
+                
+                del request.session[CART_PK]
+        elif request.user.is_authenticated():
+            try:
+                cart = request.user.cart
+            except CartModel.DoesNotExist:
+                cart = request.user.cart.create()
         else:
-            cart = self.new(request)
+            cart = CartModel.objects.create()
+            request.session[CART_PK] = cart.pk
+        
         self.cart = cart
+        
 
     def __iter__(self):
         for item in self.cart.item_set.all():
             yield item
 
-    def new(self, request):
-        cart = CartModel.objects.create()
-        request.session[CART_PK] = cart.pk
-        return cart
     
     def get_amount(self):
         return self.cart.get_amount()
@@ -77,6 +88,4 @@ class Cart(object):
             raise ItemDoesNotExist
     
     def checkout_cart(self):
-        self.cart.checked_out = True
-        self.cart.save()
-        return True
+        self.cart.item_set.filter(active=True).delete()
