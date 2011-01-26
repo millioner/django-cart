@@ -20,22 +20,25 @@ class Cart(object):
             try:
                 cart = CartModel.objects.get(pk=cart_pk)
             except CartModel.DoesNotExist:
-                cart = CartModel.objects.create()
-                request.session[CART_PK] = cart.pk
+                self.new(request)
             
             if request.user.is_authenticated() and not cart.user:
+                #Remove old cart
+                oldcart = CartModel.objects.filter(user=request.user)
+                if oldcart.exists():
+                    oldcart.user = None
+                    oldcart.save()
+                
                 cart.user = request.user
                 cart.save()
                 
-                del request.session[CART_PK]
         elif request.user.is_authenticated():
             try:
                 cart = request.user.cart
             except CartModel.DoesNotExist:
                 cart = request.user.cart.create()
         else:
-            cart = CartModel.objects.create()
-            request.session[CART_PK] = cart.pk
+            self.new(request)
         
         self.cart = cart
         
@@ -43,7 +46,11 @@ class Cart(object):
     def __iter__(self):
         for item in self.cart.item_set.all():
             yield item
-
+    
+    def new(self, request):
+        cart = CartModel.objects.create()
+        request.session[CART_PK] = cart.pk
+        return cart
     
     def get_amount(self):
         return self.cart.get_amount()
