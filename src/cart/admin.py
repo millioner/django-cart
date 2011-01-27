@@ -13,11 +13,10 @@ class ItemAdminInline(generic.GenericTabularInline):
     ct_fk_field = "object_pk"
 
 class CartAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'creation_date', 'user')
+    list_display = ('pk', 'creation_date')
     list_filter = ('creation_date',)
     date_hierarchy = 'creation_date'
     readonly_fields = ('creation_date',)
-    raw_id_fields = ('user',)
     inlines = (ItemAdminInline,)
 
 admin.site.register(Cart, CartAdmin)

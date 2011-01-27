@@ -10,8 +10,6 @@ from django.contrib.contenttypes import generic
 class Cart(models.Model):
     creation_date = models.DateTimeField(verbose_name=_('creation date'), default=datetime.now)
     
-    user = models.OneToOneField('auth.User', related_name="cart", blank=True, null=True)
-    
     class Meta:
         verbose_name = _('cart')
         verbose_name_plural = _('carts')
@@ -21,7 +19,7 @@ class Cart(models.Model):
         return unicode(self.creation_date)
     
     def get_active_items(self):
-        return self.item_set.filter(active=True)
+        return self.items.filter(active=True)
     
     def get_amount(self):
         return sum(item.get_amount() for item in self.get_active_items())
@@ -36,7 +34,7 @@ class ItemManager(models.Manager):
         return super(ItemManager, self).get(*args, **kwargs)
 
 class Item(models.Model):
-    cart = models.ForeignKey(Cart, verbose_name=_('cart'))
+    cart = models.ForeignKey(Cart, verbose_name=_('cart'), related_name="items")
     
     quantity = models.PositiveIntegerField(_('quantity'), default=1)
     
