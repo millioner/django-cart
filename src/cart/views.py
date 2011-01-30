@@ -11,6 +11,7 @@ from django.contrib import messages
 from django.views.generic.create_update import apply_extra_context
 from django.views.decorators.http import require_POST, require_GET
 from django.core.exceptions import NON_FIELD_ERRORS
+from django.utils import simplejson
 
 from .cart import Cart, ItemAlreadyExists
 from .models import Item
@@ -32,16 +33,16 @@ def add_to_cart(request, content_type_pk, object_pk, quantity,
     
     cart = Cart(request).cart
     
-    if cart.items.filter(content_type__pk=content_type_pk, object_pk=object_pk).exists() and request.is_ajax():
-        raise ItemAlreadyExists
-    
     if not cart.items.filter(content_type__pk=content_type_pk, object_pk=object_pk).exists():
         cart.items.create(content_type_id=content_type_pk, object_pk=object_pk, quantity=quantity)
-        message = success_message
+        message, status = success_message, 1
     else:
-        message = duplicate_massage
+        message, status = duplicate_massage, 0
         
     if request.is_ajax():
+        return HttpResponse(simplejson.dumps({'message': message, 'status': status}), 
+                        content_type="application/json; charset=utf-8")
+        
         return HttpResponse(message)
     else:
         messages.info(request, message)
