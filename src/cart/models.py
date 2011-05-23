@@ -61,7 +61,7 @@ class Item(models.Model):
         return 'Content: %s, cart: %s' % (self.content_object, self.cart)
 
     def get_amount(self):
-        return self.content_object.get_amount(self.quantity)
+        return self.content_object.get_amount(self.quantity, self.params)
     
     def switch(self, state):
         self.active = state

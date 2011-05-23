@@ -22,6 +22,8 @@ urlpatterns = patterns('cart.views',
     }, name="disable_item"),
     
     url('^change_quantity/(?P<pk_param>[\w]+)/(?P<param_name>[\w]+)/$', 'change_quantity', {}, name='change_quantity'), 
+
+    url('^change_param/(?P<pk_param>[\w]+)/(?P<param_name>[\w]+)/$', 'change_param', {}, name='change_param'), 
     
     url('^remove/(?P<item_pk>[\d]+)/$', 'remove_item', {
         'success_message': _('Deleted successfully.'),

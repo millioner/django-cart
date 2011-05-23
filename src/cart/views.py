@@ -100,6 +100,25 @@ def change_quantity(request, pk_param, param_name, queryset=Item.objects.all(), 
     else:
         return redirect(redirect_to)
 
+@require_POST
+def change_param(request, pk_param, param_name, queryset=Item.objects.all(), redirect_to="show_cart"):
+    
+    item_pk = request.POST.get(pk_param)
+    param = request.POST.get(param_name)
+    
+    
+    cart = Cart(request).cart
+    cart_item = get_object_or_404(queryset.filter(cart=cart), pk=item_pk)
+    
+    if param:
+        cart_item.params[param_name] = param
+        cart_item.save()
+    
+    if request.is_ajax():
+        return HttpResponse(cart_item.get_amount())
+    else:
+        return redirect(redirect_to)
+    
 
 def clear(request, message=ugettext(u'The cart was cleared successfully.'), redirect_to="show_cart"):
     Cart(request).clear()
