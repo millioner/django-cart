@@ -29,7 +29,7 @@ class ItemManager(models.Manager):
     def get(self, *args, **kwargs):
         if 'content_object' in kwargs:
             kwargs['content_type'] = ContentType.objects.get_for_model(type(kwargs['content_object']))
-            kwargs['object_id'] = kwargs['content_object'].pk
+            kwargs['object_pk'] = kwargs['content_object'].pk
             del(kwargs['content_object'])
         return super(ItemManager, self).get(*args, **kwargs)
 
