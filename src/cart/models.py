@@ -7,7 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 
-from cart.fields import DictionaryField
+from .fields import DictionaryField
 
 class Cart(models.Model):
     creation_date = models.DateTimeField(verbose_name=_('creation date'), default=datetime.now)
