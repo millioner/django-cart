@@ -7,6 +7,8 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 
+from cart.fields import DictionaryField
+
 class Cart(models.Model):
     creation_date = models.DateTimeField(verbose_name=_('creation date'), default=datetime.now)
     
@@ -39,6 +41,8 @@ class Item(models.Model):
     quantity = models.PositiveIntegerField(_('quantity'), default=1)
     
     active = models.BooleanField(_("active"), default=True)
+
+    params = DictionaryField(_('Cart item params'), null=True, blank=True)
     
     # product as generic relation
     content_type = models.ForeignKey(ContentType)
